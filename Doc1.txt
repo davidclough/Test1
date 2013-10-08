@@ -1,0 +1,3 @@
+Added some text after first staging.
+Added another line after first commit.
+asdfgh
