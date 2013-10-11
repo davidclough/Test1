@@ -1,0 +1,1 @@
+Battery seems to run out even if don't use it. Was it left on standby?
