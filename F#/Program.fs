@@ -329,12 +329,201 @@ type StockBooking =
     | Incoming of Product * Count
     | Outgoing of Product * Count
 
+let bookings =
+    [ Incoming(OwnProduct("Rubber Chicken"), 50);
+        Incoming(SupplierReference(2341), 150);
+        Outgoing(OwnProduct("Pulley"), 250);
+        Outgoing(SupplierReference(2345), 550);
+    ]
+
+// Type Augmentation.
+type System.Int32 with
+    member x.IsZero = x = 0
+
+type StockBooking with
+    member x.IsIncomingBooking() =
+        match x with
+        |Incoming(_,_) -> true
+        | _ -> false
+// Use of function didn't work here either. This creates a "StockBooking -> bool". However a "unit -> bool" is expected.
+////type StockBooking with
+////    member x.IsIncomingBooking = function
+////        |Incoming(_,_) -> true
+////        | _ -> false
+
 let discriminatedUnionsTests argv = 
+    let i5 = 5
+    printfn "i5.IsZero = %A" i5.IsZero
+
+    let booking = Incoming(SupplierReference(63), 20)
+    printfn "booking.IsIncomingBooking() = %A" (booking.IsIncomingBooking())
+
     printfn ""
 
 //---------------------------------------------------------------------------------------------
 
+type 'a List = E | L of 'a * ' a List
+
+let ints  = L(10, L(12, L(15, E)))
+
+let rec listSum = function
+    | E -> 0
+    | L(x, xs) -> x + (listSum xs)
+
+let linkedListTests argv = 
+    printfn "ints = %A" ints
+    printfn "listSum ints = %A" (listSum ints)
+
+    printfn ""
+
+//---------------------------------------------------------------------------------------------
+
+type Rectangle =
+    { Width: float; Length: float }
+
+let rect1 = { Width = 5.4; Length = 6.9 }               // Most commonly no need to specify type.
+let rect2 = { Rectangle.Width = 5.4; Length = 5.4 }
+let rect3 : Rectangle = { Width = 5.4; Length = 6.9 }
+
+type Circle = 
+    //{ Radius: float }
+    { mutable Radius: float }
+    member x.RadiusSquare with get() = x.Radius * x.Radius
+    member x.CalcArea() = System.Math.PI * x.RadiusSquare
+
+let c1 = { Radius = 3.3 }
+c1.Radius <- 5.4
+
+type Ellipse =
+    { RadiusX: float; RadiusY: float }
+    member x.GrowX dx = { x with RadiusX = x.RadiusX + dx }
+    member x.GrowY dy = { x with RadiusY = x.RadiusY + dy }
+
+let zeroCircle = function
+    | { Radius = 0.0 } -> true
+    | _ -> false
+
+let isSquare = function
+    | { Width = width; Length = length } -> width = length
+
 let recordTests argv = 
+    printfn "zeroCircle c1 = %A" (zeroCircle c1)
+    printfn "isSquare rect1 = %A" (isSquare rect1)
+    printfn "isSquare rect2 = %A" (isSquare rect2)
+
+    printfn ""
+
+//---------------------------------------------------------------------------------------------
+
+// Data Manipulation.
+
+// Data store.
+type Product' = { Name: string; Price: decimal }
+type OrderLine = { Product: Product'; Count: int }
+type Order = { OrderId: string; Lines: OrderLine list }
+
+let rubberChicken = { Name = "Rubber chicken"; Price = 8.99m }
+let pulley = { Name = "Pulley"; Price = 1.95m }
+let fairyDust = { Name = "Fairy Dust"; Price = 3.99m }
+let foolsGold = { Name = "Fool's Gold"; Price = 14.98m }
+
+let orders =
+    [
+        { OrderId = "O1"; 
+            Lines = [{ Product = rubberChicken; Count = 18 };
+                         { Product = pulley; Count = 20 }]};
+        { OrderId = "O2"; 
+            Lines = [{ Product = fairyDust; Count = 80 }]};
+        { OrderId = "O3"; 
+            Lines = [{ Product = foolsGold; Count = 33 };
+                         { Product = fairyDust; Count = 33 }]};
+        { OrderId = "O4"; 
+            Lines = [{ Product = pulley; Count = 500 }]};
+        { OrderId = "O5"; 
+            Lines = [{ Product = rubberChicken; Count = 18 };
+                         { Product = pulley; Count = 20 }]};
+        { OrderId = "O6"; 
+            Lines = [{ Product = foolsGold; Count = 100 };
+                         { Product = fairyDust; Count = 100 };
+                         { Product = pulley; Count = 100 };
+                         { Product = rubberChicken; Count = 100 }]};
+        { OrderId = "O7"; 
+            Lines = [{ Product = fairyDust; Count = 160 }]};
+        { OrderId = "O8"; 
+            Lines = [{ Product = rubberChicken; Count = 18 };
+                         { Product = pulley; Count = 20 }]};
+        { OrderId = "O9"; 
+            Lines = [{ Product = foolsGold; Count = 260 }]};
+        { OrderId = "O10"; 
+            Lines = [{ Product = pulley; Count = 80 }]};
+    ]
+
+// Filter functions.
+let rec filterList f l =
+    match l with
+    | [] -> l
+    | x :: xs -> (if f x then [x] else []) @ (filterList f xs)
+
+// This original implementation that I typed in caused compilation errors.
+// It is the "l" that causes the problem.
+// 1st: f:('a -> 'a) -> l('a List) -> 'a List
+////let rec mapList f l =
+////    match l with
+////    | [] -> l
+////    | x :: xs -> (f x) :: (mapList f xs)
+// 2nd: f:('a -> 'b) -> l('a List) -> 'b List
+let rec mapList f l = 
+    match l with 
+    | [] -> []
+    | x :: xs -> f x :: (mapList f xs)
+
+let rec foldList f s l =
+    match l with
+    | [] -> s
+    | x :: xs -> foldList f (f s x) xs
+
+let highValueOrders orders minValue =
+    let linePrice l = decimal(l.Count) * l.Product.Price
+    let orderPrice o = o.Lines |> mapList linePrice |> foldList(+) 0m
+
+    orders |>
+    mapList (fun o -> o.OrderId, orderPrice o) |>
+    filterList (fun (_, price) -> price > minValue)
+
+// Using standard functions:
+let highValueOrders' orders minValue =
+    let linePrice l = decimal(l.Count) * l.Product.Price
+    let orderPrice o = o.Lines |> List.map linePrice |> List.fold(+) 0m
+
+    orders |>
+    List.map (fun o -> o.OrderId, orderPrice o) |>
+    List.filter (fun (_, price) -> price > minValue)
+
+let filterSequence f s =
+    seq {
+        for i in s do
+            if f i then yield i
+        }
+
+// Using standard sequence functions:
+let highValueOrders'' orders minValue =
+    let linePrice l = decimal(l.Count) * l.Product.Price
+    let orderPrice o = o.Lines |> Seq.map linePrice |> Seq.fold(+) 0m
+
+    orders |>
+    Seq.map (fun o -> o.OrderId, orderPrice o) |>
+    Seq.filter (fun (_, price) -> price > minValue)
+
+let dataManipulationTests argv = 
+    printfn "filterList (fun x -> x < 10) [1;3;17;20] = %A" (filterList (fun x -> x < 10) [1;3;17;20])
+    //printfn "mapList (fun x -> x * x) [1;3;17;20] = %A" (mapList (fun x -> x * x) [1;3;17;20])
+    printfn "foldList (fun r v -> r + v) 0 [1;3;17;20] = %A" (foldList (fun r v -> r + v) 0 [1;3;17;20])
+    printfn "foldList (foldList (+) 0 [1;3;17;20] = %A" (foldList (+) 0 [1;3;17;20])
+    printfn "highValueOrders orders 250m = %A" (highValueOrders orders 250m)
+    printfn "highValueOrders' orders 250m = %A" (highValueOrders' orders 250m)
+    printfn "highValueOrders'' orders 250m = %A" (highValueOrders'' orders 250m)
+    printfn "filterSequence (fun x -> x > 2) { 1..5 } = %A" (filterSequence (fun x -> x > 2) { 1..5 })
+
     printfn ""
 
 //---------------------------------------------------------------------------------------------
@@ -370,7 +559,9 @@ let main argv =
     sequenceTests argv
 
     discriminatedUnionsTests argv
+    linkedListTests argv
     recordTests argv
+    dataManipulationTests argv
 
     endProgram()
 
