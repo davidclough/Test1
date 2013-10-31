@@ -528,16 +528,159 @@ let dataManipulationTests argv =
 
 //---------------------------------------------------------------------------------------------
 
-let interfaceTests argv = 
+// Very simple.
+type IMyInterface =
+    abstract member Value : int with get
+
+type IDerivedInterface =
+    inherit IMyInterface
+
+    abstract member Add: int -> int -> int
+
+type MyClass() =
+    interface IMyInterface with             // "interface" not declaring the interface but doing the interfacing.
+        member x.Value with get() = 13
+
+type MyOtherClass() =
+    member this.Add x y = x + y
+
+    interface IDerivedInterface with
+        member i.Add x y = i.Add x y
+        member x.Value = 42
+
+let interfaceTests argv =
+    let moc = MyOtherClass()
+    printfn "moc.Add 10 20 = %A" (moc.Add 10 20)
+
+    //printfn "moc.Add 10 20 = %A" (moc.Value)
+    printfn "(moc :> IMyInterface).Value = %A" (moc :> IMyInterface).Value
+    printfn "(moc :> IDerivedInterface).Value = %A" (moc :> IDerivedInterface).Value
+    printfn "((moc :> IDerivedInterface).Add 10 20) = %A" ((moc :> IDerivedInterface).Add 10 20)
+
     printfn ""
 
 //---------------------------------------------------------------------------------------------
+
+// All standard OO mechanism plus some extra advanced ones are available.
+
+// Looks sort of like augmentation.
+let hiObject = { new obj() with member x.ToString() = "Hi!" }
+
+type IDeepThought =
+    abstract member TheAnswer: int with get
+    abstract member AnswerString: unit -> string
+
+type DeepThought() =
+    interface IDeepThought with
+        member x.TheAnswer = 42
+        ////member x.AnswerString() = sprintf "The answer id %A" TheAnswer
+        member x.AnswerString() = sprintf "The answer id %A" (x :> IDeepThought).TheAnswer
+
+let htmlDeepThought =
+    let deepThought = DeepThought() :> IDeepThought
+    { new IDeepThought with                                 // Object expression.
+        member x.TheAnswer = deepThought.TheAnswer
+        member x.AnswerString() = sprintf "<b>%s</b>" (deepThought.AnswerString()) }
+
+let confusedDeepThought answer =        // Constructor (therefore for a class).
+    { new IDeepThought with             // Need the "new".       
+        member x.TheAnswer = answer
+        member x.AnswerString() = "Err?" }
 
 let typeTests argv = 
+    printfn "hiObject = %A" hiObject
+
+    printfn "htmlDeepThought.AnswerString() = %A" (htmlDeepThought.AnswerString())
+
+//    printfn " = %A" confusedDeepThought.TheAnswer             // confusedDeepThought is not an object; it is constructor function (like JS).
+//    printfn " = %A" confusedDeepThought.AnswerString()
+    printfn "(confusedDeepThought 18).TheAnswer = %A" (confusedDeepThought 18).TheAnswer
+    printfn "(confusedDeepThought 22).AnswerString() = %A" ((confusedDeepThought 22).AnswerString())
+    let cdt = confusedDeepThought 35
+    0
+
+//---------------------------------------------------------------------------------------------
+
+// exception is a keyword. Also raise and reraise. Not quite as complete coverage as C#
+// try/with is an expression by default.
+// when expressions are in .NET but not C#.
+
+// Custom exception.
+exception MyCustomException of int * string
+    with
+        // Information in the variables was not displayed by default.
+        override x.Message =
+            let (MyCustomException(i, s)) = upcast x
+            sprintf "Int: %d, Str: %s" i s
+
+let rec fact1 x =
+    if x < 0 then invalidArg "x" "Value must be >= 0"       // Generates ArgumentException.
+    match x with
+    | 0 -> 1
+    | _ -> x * (fact1 (x - 1))
+
+let output1 (o: obj) =
+    try
+        let os = o :?> string
+        printfn "Object is %s" os
+    with
+    // :? for pattern matching against types
+    | :? System.InvalidCastException as ex -> printfn "Can't cast, message was %s" ex.Message
+
+let result =
+    try
+        Some(10 / 0)
+    with
+    | :? System.DivideByZeroException -> None
+
+// Cannot have catch...finally in same clause.
+let getValue() =
+    try
+        printfn "Returning Value"
+        42                              // This is the type of the result.
+    finally
+        printfn "In the finally block now"      // Nothing returned, therefore return type Unit.
+
+let exceptionsTests argv = 
+    //raise (MyCustomException (10, "Badgonkeyed"))
+    //failwith "Some error has occurred"
+    //fact1 -2
+    output1 "3333string"
+    output1 3
+
+    printfn "%A" result
+    printfn "%A" getValue       // <fun:exceptionsTests@652>
+    printfn "%A" (getValue())
+
     printfn ""
 
 //---------------------------------------------------------------------------------------------
 
+// 2 standard ways of ensuring object will be disposed: "use" and "using" (a helper function). MS suggests "use".
+
+let createDisposable f =
+    { new System.IDisposable with member x.Dispose() = f() }
+
+let outerFunction() =
+    //let disposable = createDisposable (fun () -> printfn "Now disposing of myself")
+    // Replace "let" with "use" and it will be disposed at the end of the block that it is contained in.
+    use disposable = createDisposable (fun () -> printfn "Now disposing of myself")
+    printfn "In outer function"
+
+let outerFunction'() =
+    // Bit more fine-grained but less automatic. Here we disposed before the end of the containing block.
+    using (createDisposable (fun () -> printfn "Now using disposing myself"))
+        (fun d -> printfn "Acting on the disposable object now")
+    printfn "In outer function"
+
+let disposablesTests argv = 
+    outerFunction()
+    printfn "-----------------"
+    outerFunction'()
+
+    printfn ""
+
+//---------------------------------------------------------------------------------------------
 
 let endProgram() =
     System.Console.ReadLine() |> ignore    // The brackets make a difference here.
@@ -562,6 +705,12 @@ let main argv =
     linkedListTests argv
     recordTests argv
     dataManipulationTests argv
+
+    interfaceTests argv
+    typeTests argv |> ignore
+
+    exceptionsTests argv
+    disposablesTests argv
 
     endProgram()
 
