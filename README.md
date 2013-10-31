@@ -3,7 +3,7 @@ TODO: Will be adding some md relating to this repository.
 
 
 
-GitHub Markup
+My First Repository
 =============
 
 We use this library on GitHub when rendering your README or any other
