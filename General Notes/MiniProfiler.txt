@@ -1,0 +1,32 @@
+I think this is all need to do:
+
+1) Include "MiniProfiler" via NuGet.
+
+2) Put following, or similar, in Global.asax:
+
+        protected void Application_BeginRequest(object sender, EventArgs e)
+        {
+            // MiniProfiler.
+            if (ConfigurationManager.AppSettings["UseMiniProfiler"] == "true")
+            {
+                MiniProfiler.Start();
+            }
+
+            // NOTE: Also added Glimpse - go to http://localhost/Danwood/glimpse.axd to switch on.
+        }
+
+        protected void Application_EndRequest(object sender, EventArgs e)
+        {
+            MiniProfiler.Stop();
+        }
+
+3) Put following, or similar, where want profile stuff to show, e.g. som master:
+
+        <% if (ConfigurationManager.AppSettings["UseMiniProfiler"] == "true")
+           { %> 
+            <%= StackExchange.Profiling.MiniProfiler.RenderIncludes() %>
+        <% } %>
+
+        I ended up putting at bottom of page as interfered with CSS of odd controls.
+
+
