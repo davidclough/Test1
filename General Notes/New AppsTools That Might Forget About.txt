@@ -1,0 +1,53 @@
+howlwer.js (sounds)
+Css Cop
+
+Fluent Assertions
+xUnit.net
+
+PDFsharp
+
+JS Fiddle
+
+Mail Catcher
+
+Authorized Action Link Extension for ASP.NET MVC
+
+Cucumber
+http://www.kenneth-truyers.net/2013/08/25/automated-acceptance-testing-with-cucumber-for-net-and-java/
+Selenium
+SpecFlow
+
+Redgate - ANTS Performance Profiler
+http://www.codeproject.com/Articles/584053/Why-is-your-ASP-NET-application-running-slow
+
+GitHub - (video on WANdisco)
+http://www.wandisco.com/media/webinar-replays/introduction-git-0?mkt_tok=3RkMMJWWfF9wsRoiva7OZKXonjHpfsX76%2BUoX6WylMI%2F0ER3fOvrPUfGjI4DSsNkI%2BSLDwEYGJlv6SgFSLnHMa1zzLgMUhk%3D
+http://git-scm.com/book/en/Getting-Started-Git-Basics
+http://visualstudiogallery.msdn.microsoft.com/63a7e40d-4d71-4fbb-a23b-d262124b8f4c - Git Source Control Provider for Visual Studio.
+
+Fusion Log Viewer
+http://www.ademiller.com/blogs/tech/2008/01/gotchas-fusion-log-viewer-your-best-friend-for-assembly-load-errors/
+
+Process Monitor
+
+URL Rewrite (IIS)
+
+Xamarin
+
+Glimpse
+Mini Profiler
+SQL Prompt 5
+SQLS Data Tools
+
+VS Extensions and Updates:
+CssCop
+Git Source Control Provider
+MS Web Developer Tools
+NuGet Package Manager
+NUnit Test Adapter
+Productivity Power Tools 2012
+Web Essentials 2012
+Specflow
+SQL Connect
+Team Foundation Server Power Tools 2012 (don't forget to turn tat thing that puts green arrows on file explorer icons off - in another document?)
+Visual Studio Extensions for Windows Library for JavaScript
