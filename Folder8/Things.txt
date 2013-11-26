@@ -4,6 +4,3 @@ mongoDB
 Single file code applications
 
 I added this bad boy directly to master branch and not to newBranch1.
-newBranch1 thing
-
-Thinking about it, this was an awkward problem for anything to resolve as separate lines of text had been added at the same point (which would go first?)
