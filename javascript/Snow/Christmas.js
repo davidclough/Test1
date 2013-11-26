@@ -163,10 +163,10 @@ CHRISTMAS.snowStorm = function(settings) {
             snow[i].style.top = snow[i].posy + "px";
             
             if (snow[i].posy >= marginBottom - 0 * snow[i].size || parseInt(snow[i].style.left) > (marginRight - 3 * lftrght[i])) {
-                if (settings.snowingZone === 1) { snow[i].posx=randomInteger(marginRight - snow[i].size); }
-                if (settings.snowingZone === 2) { snow[i].posx=randomInteger(marginRight / 2-snow[i].size); }
-                if (settings.snowingZone === 3) { snow[i].posx=randomInteger(marginRight / 2-snow[i].size) + marginRight / 4; }
-                if (settings.snowingZone === 4) { snow[i].posx=randomInteger(marginRight / 2-snow[i].size) + marginRight / 2; }
+                if (settings.snowingZone === 1) { snow[i].posx = randomInteger(marginRight - snow[i].size); }
+                if (settings.snowingZone === 2) { snow[i].posx = randomInteger(marginRight / 2 - snow[i].size); }
+                if (settings.snowingZone === 3) { snow[i].posx = randomInteger(marginRight / 2 - snow[i].size) + marginRight / 4; }
+                if (settings.snowingZone === 4) { snow[i].posx = randomInteger(marginRight / 2 - snow[i].size) + marginRight / 2; }
                 if (!stoppingSnowing) {
                     snow[i].posy = randomInteger(-1 * marginBottom - marginBottom - 6 * snow[i].size);
                 }
