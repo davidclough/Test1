@@ -3,30 +3,32 @@
 // Distributed by Hypergurl
 // Permission given to use the script provided that this notice remains as is.
 //
-// DC for tidying up mess (bring into 21st century), modularising, enhancing and making it work in HTML5. Added stopSnowing and settings.
+// DC for tidying up mess (bring into 21st century), modularising, enhancing and making it work in HTML5. Added stopSnowing and settings. Also introduced window.requestAnimationFrame.
+
+// TODO: Add a bit of wind.
 
 var CHRISTMAS = {};
 
 CHRISTMAS.utilities = (function() {
     // Taken from http://www.browniesblog.com/A55CBC/blog.nsf/dx/09072011063106PMMBRBZJ.htm (for merging a user-supplied settings object with a default settings object).
-    var mergeObjects = function(obj1, obj2) { 
+    var mergeObjects = function(obj1, obj2) {
         // Merges two objects, returning all objects in obj1 unless those same elements are also in obj2.
         // In that case the elements in obj2 will take precedence. This is the equivalent of jQuery.merge().
-        obj1 = obj1 || {}; 
-        obj2 = obj2 || {}; 
+        obj1 = obj1 || {};
+        obj2 = obj2 || {};
         returnObj = {};
 
-        for (var index in obj1) { 
-            returnObj[index] = obj2[index] || obj1[index]; 
-        } 
-        return returnObj; 
+        for (var index in obj1) {
+            returnObj[index] = obj2[index] || obj1[index];
+        }
+        return returnObj;
     }
 
-    var randomInteger = function(range) {		
+    var randomInteger = function(range) {
         var i = Math.floor(range * Math.random());
         return i;
     };
-    
+
     return {
         mergeObjects: mergeObjects,
         randomInteger: randomInteger
@@ -35,9 +37,9 @@ CHRISTMAS.utilities = (function() {
 
 // Use "object specifier" pattern to allow caller to set various arguments if they want to but fall back to default values otherwise.
 CHRISTMAS.snowStorm = function(settings) {
-    
+
     // Any properties in here can be supplied when calling this function.
-    settings = CHRISTMAS.utilities.mergeObjects({ 
+    settings = CHRISTMAS.utilities.mergeObjects({
         // Set the number of snowflakes (more than 30 - 40 not recommended) - DC: That was 10 years ago.
         numSnowflakes: 35,
 
@@ -84,20 +86,21 @@ CHRISTMAS.snowStorm = function(settings) {
     var currentlySnowing;
     // When stop snowing allow flakes currently on the screen to continue falling.
     var stoppingSnowing;
-    
+    var requestAnimationFrameId;
+
     var randomInteger = CHRISTMAS.utilities.randomInteger;
-    
+
+
     var startSnowing = function() {
         if (browserOk) {
             if (!snowflakesAdded) {
-                for (i = 0; i <= settings.numSnowflakes-1; i++) {
+                for (i = 0; i <= settings.numSnowflakes - 1; i++) {
                     var newDiv = document.createElement("div");
                     newDiv.id = "s" + i;
                     var markupIndex = Math.floor((Math.random() * settings.snowflakeMarkup.length));
                     newDiv.innerHTML = settings.snowflakeMarkup[markupIndex];
                     document.body.appendChild(newDiv);
                 }
-                snowflakesAdded = true;
             }
             if (ie5 || opera) {
                 marginBottom = document.body.clientHeight;
@@ -107,19 +110,24 @@ CHRISTMAS.snowStorm = function(settings) {
                 marginBottom = window.innerHeight;
                 marginRight = window.innerWidth;
             }
-            
-            initialiseSnow();
-            currentlySnowing = true;
+
+            if (!snowflakesAdded) {
+                initialiseSnow();
+                snowflakesAdded = true;
+             }
             stoppingSnowing = false;
-            moveSnow();
+            if (!currentlySnowing) {
+                currentlySnowing = true;
+                moveSnow();
+            }
         }
     };
 
     var initialiseSnow = function() {
         var snowsizerange = settings.maxSnowflakeSize - settings.minSnowflakeSize;
         for (i = 0; i <= settings.numSnowflakes-1; i++) {
-            crds[i] = 0;                      
-            lftrght[i] = Math.random() * 15;         
+            crds[i] = 0;
+            lftrght[i] = Math.random() * 15;
             x_mv[i] = 0.03 + Math.random() / 10;
             snow[i] = document.getElementById("s" + i);
             snow[i].style.fontFamily = settings.snowType[randomInteger(settings.snowType.length)];
@@ -151,17 +159,18 @@ CHRISTMAS.snowStorm = function(settings) {
     var stopSnowing = function() {
         stoppingSnowing = true;
     };
-    
+
     var moveSnow = function() {
         var snowStillFalling;
-        for (i = 0; i <= snow.length-1; i++) {
+        for (i = 0; i <= snow.length - 1; i++) {
             crds[i] += x_mv[i];
-            if (!stoppingSnowing || snow[i].posy > -snow[i].offsetHeight) {
+            //if (!stoppingSnowing || snow[i].posy > -snow[i].offsetHeight) {
+            if (!stoppingSnowing || snow[i].posy < marginBottom) {
                 snow[i].posy += snow[i].sink;
             }
             snow[i].style.left = Math.floor(snow[i].posx + lftrght[i] * Math.sin(crds[i])) + "px";
             snow[i].style.top = snow[i].posy + "px";
-            
+
             if (snow[i].posy >= marginBottom - 0 * snow[i].size || parseInt(snow[i].style.left) > (marginRight - 3 * lftrght[i])) {
                 if (settings.snowingZone === 1) { snow[i].posx = randomInteger(marginRight - snow[i].size); }
                 if (settings.snowingZone === 2) { snow[i].posx = randomInteger(marginRight / 2 - snow[i].size); }
@@ -175,16 +184,21 @@ CHRISTMAS.snowStorm = function(settings) {
             }
         }
         if (stoppingSnowing && !snowStillFalling) {
+            window.cancelAnimationFrame(requestAnimationFrameId);
             currentlySnowing = false;
         }
         if (currentlySnowing) {
             // http://stackoverflow.com/questions/18019680/function-is-not-defined-error
+/*
             var timer = setTimeout(function() {
                 moveSnow();
             }, 50);
+*/
+
+            requestAnimationFrameId = window.requestAnimationFrame(moveSnow);
         }
     };
-    
+
     return {
         startSnowing: startSnowing,
         stopSnowing: stopSnowing
