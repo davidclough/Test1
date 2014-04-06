@@ -1,4 +1,28 @@
-﻿// Learn more about F# at http://fsharp.net
+﻿module Program
+
+//open System
+
+let withThousandsSeparator (i: int64) =
+    System.String.Format("{0:#,##0}", i)
+
+// GOOD INFO: http://en.wikibooks.org/wiki/F_Sharp_Programming/Higher_Order_Functions#A_Timer_Function
+let duration f = 
+    let timer = new System.Diagnostics.Stopwatch()
+    timer.Start()
+    let returnValue = f()
+    timer.Stop()
+    printfn "Elapsed Time: %sms (%s ticks)"
+            (timer.ElapsedMilliseconds |> withThousandsSeparator)
+            (timer.ElapsedTicks |> withThousandsSeparator)
+    returnValue
+
+let time f x = System.Diagnostics.Stopwatch.StartNew() |> (fun sw -> (f x, sw.Elapsed))
+
+//
+// http://fsharpforfunandprofit.com/posts/      lots of posts
+//
+
+// Learn more about F# at http://fsharp.net
 // See the 'F# Tutorial' project for more help.
 
 // http://msdn.microsoft.com/en-us/library/dd233160.aspx
@@ -44,16 +68,18 @@ let rec fib = function
     | 1 -> 1
     // This going to be very slow as 2 recursive calls: 1, 2, 4, ... 2 ^ 46 = 7E13
     // Really want to just store previous calculations as go along.
-    | x when x > 1 -> fib(x - 2) + fib (x - 1)
+    | x when x > 1 -> fib(x - 2) + fib(x - 1)
     | _ -> failwith "must be called with non-negative int"
 
 // Or just use the formula (need something extra to convert between int and float domains).
 let sqrt5 = sqrt 5.0
-let fib' x =
-    sqrt5 / 5.0 * ((1.0 + sqrt5) / 2.0) ** x - ((1.0 - sqrt5) / 2.0) ** x       // http://rybkaforum.net/cgi-bin/rybkaforum/topic_show.pl?tid=15843
-
-let fib'' (x: int) =
-    int (fib' (float x))
+let fib' = function
+    | 0 -> 0
+    | x when x > 0 ->
+        let x' = float x
+        let n = sqrt5 / 5.0 * ((1.0 + sqrt5) / 2.0) ** x' - ((1.0 - sqrt5) / 2.0) ** x'       // http://rybkaforum.net/cgi-bin/rybkaforum/topic_show.pl?tid=15843
+        int (System.Math.Round(n))
+    | _ -> failwith "must be called with non-negative int"
 
 let rec triangle = function
     | 0 -> 0
@@ -69,7 +95,8 @@ let factorialTests argv =
 
     //printfn "%d" (fib -5)
     printfn "Fibonacci:"
-    for i in [0..20] do
+    for i in [0..40] do
+        printf "\r\n%A," (i, fib' i)
         printf "%A," (i, fib i)
     printfn ""
 
@@ -77,6 +104,48 @@ let factorialTests argv =
     for i in [0..2..50] do
         printf "%A," (i, triangle i)
     printfn ""
+
+
+    // Added later after Ken's complex computations. Uses caching of previous results.
+    // http://stackoverflow.com/questions/2845744/generating-fibonacci-series-in-f
+    // generate an infinite Fibonacci sequence
+    let fibSeq = Seq.unfold(fun (a, b) -> Some(a + b, (b, a + b)))(0, 1)
+    // take the first few numbers in the sequence and convert the sequence to a list
+    let fibList2 = fibSeq |> Seq.takeWhile(fun x -> x <= 400 ) |> Seq.toList
+
+    // This one doesn't include the 0 and 1 elements at the beginning (hence 39 |-> 40) - the other sequence starts from 0th element.
+    let fibList = fibSeq |> Seq.take(39) |> Seq.toList
+    printf "Fibonacci with caching: %A\r\n" (40, List.nth fibList 38)
+    printfn ""
+    printfn ""
+
+    // Compare fib' (formula) and fibSeq (caching) for big number.
+    printf "Fibonacci with formula: %A\r\n" (5551190, fib' 5551190)
+    let fibSeq' = Seq.unfold(fun (a, b) -> Some(a + b, (b, a + b)))(0.0, 1.0)
+    let fibList' = fibSeq' |> Seq.take(5551189) |> Seq.toList
+    printf "Fibonacci with caching: %A\r\n" (5551190, List.nth fibList' 5551188)
+    // CONCLUSION: Only really noticable when got up to these gigantic figures. The calculations are performed but the results are displayed as
+    //             infinity. 1190 produced a non-infinite number. 
+    //             Also the caching one will generate a list of over 5 million floating point numbers to do its job.
+    printfn ""
+    
+    printfn "fib 5: %i" (duration(fun() -> fib 5))
+    printfn "fib 30: %i" (duration(fun() -> fib 30))
+
+
+    // Instead try storing previous calculations as go along.
+    let fib''' = function
+        | 0 -> 0
+        | 1 -> 1
+        | x when x > 1 ->
+            let fibSeq = Seq.unfold(fun (a, b) -> Some(a + b, (b, a + b)))(0, 1)
+            let fibList = fibSeq |> Seq.take(x - 1) |> Seq.toList
+            List.nth fibList (x - 2)
+        | _ -> failwith "must be called with non-negative int"
+    
+    printf "Fibonacci with caching: %A\r\n" (duration(fun() -> fib''' 40))
+
+
 
 //---------------------------------------------------------------------------------------------
 
@@ -715,5 +784,8 @@ let main argv =
     endProgram()
 
 
+// Get the feeling most of this runs in http://www.tryfsharp.org/Create
+// MyCustomException didn't.
 
+// On looking more closely, quite a lot of things failed when just tried to do one big copy, paste and run.
 
