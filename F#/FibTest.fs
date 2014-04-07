@@ -22,7 +22,7 @@ let duration f =
 let rec fib = function
     | 0 -> int64 0
     | 1 -> int64 1
-    // This going to be very slow as 2 recursive calls every time: 1, 2, 4, ... 2 ^ 46 = 7E13
+    // This going to be very slow as 2 recursive calls every time: 1, 2, 4, ... 2 ^ 46 (= 7E13), ...
     | x when x > 1 -> fib(x - 2) + fib(x - 1)
     | _ -> failwith "must be called with non-negative int"
     
@@ -54,19 +54,17 @@ for x in [0..35] do
     printf "Fibonacci with caching: %i\r\n" (duration(fun() -> fib' x))
     printf "Fibonacci with formula: %i\r\n" (duration(fun() -> fib'' x))
 
-// OBSERVATION: It might be faster but, beyond 70, the third method starts to become inaccurdue to floating point doubles only
-//              quaranteed to be accurate to 15 decimal places.
+// OBSERVATION: It might be faster but, beyond 70, the third method starts to become inaccurate due to floating point doubles only
+//              guaranteed to be accurate to 15 decimal places.
 // CONCLUSION: Second method (caching) is best as it will hold its accuracy. 
 // NOTE: Beyond 92 int64 not big enough to hold result.  
 for x in [35..93] do
     printf "\r\n%i:\r\n" x
-    // duration function causes the time taken to be printed before each line below.
     printf "Fibonacci with caching: %i\r\n" (duration(fun() -> fib' x))
     printf "Fibonacci with formula: %i\r\n" (duration(fun() -> fib'' x))
     
 // Have to go much higher to notice difference between second and third.
 for x in [300000..300010] do
     printf "\r\n%i:\r\n" x
-    // duration function causes the time taken to be printed before each line below.
     printf "Fibonacci with caching: %i\r\n" (duration(fun() -> fib' x))
     printf "Fibonacci with formula: %i\r\n" (duration(fun() -> fib'' x))
