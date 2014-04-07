@@ -1,0 +1,58 @@
+https://github.com/
+
+dc
+7
+s1
+
+
+
+----------------------------------------------------------------------------------------------
+
+"create git hub"
+https://help.github.com/articles/create-a-repo
+
+https://help.github.com/articles/set-up-git
+
+http://git-scm.com/book
+
+
+
+http://git-scm.com/book/en/Getting-Started-About-Version-Control
+
+
+----------------------------------------------------------------------------------------------
+
+SSH - My First SSH created via their example method, using david.clough@3squared.com (and no phrases or anything) in default file:
+  F:\_Documentation\Reference\Projects Reference\3Squared\Git Tests\.ssh    (id_rsa.pub - though can't see the file in Explorer)
+  
+  clip < ~/.ssh/id_rsa.pub
+  
+  
+ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAv3l4BHleiLyb9fk5B6vsKLNH5NeKrNcHhDYwc7co6OD9Cfj6GubJihsXz5Z/Kd4Bwetn8draWUYMinH+vZJmrRo72CuGbmZW8fAXPLQdweu7Jn20diLs5C56YlHFvnmgDMrqiVeJxWHE7KT7Vgak153DhpRScKWdUXVUlUUOChW5WelXgOfamgVXSY518MAnUdpfLSYpGYXHeq+ZlJSmo8z9Lo9vw24Zx3MJkM5p+qcV4nxaHRGQ2XxdFM8w0YcSOS82ZTmpptYea/xM2UwgFNxKXh2z4VGyHbukkJhMkwHvADNItv4oL4S/NyBA2dqpIMtbu29lwKMuT+I+cqLw5Q== david.clough@3squared.com
+
+
+----------------------------------------------------------------------------------------------
+
+git@github.com:davidclough/Test1.git
+
+
+git remote add origin git@github.com:davidclough/Test1.git
+git remote set-url origin git@github.com:davidclough/Test1.git
+file:///C:/Program%20Files%20%28x86%29/Git/doc/git/html/git-remote.html
+the ORIGIN thing looks like a way of doing the CD thing for the remote URL so don't have to mention a full locator in when perform actions.
+----------------------------------------------------------------------------------------------- 
+ 
+ http://intranet.3squared.com/2013/09/mobile-dev-team-git-guidelines/
+ http://intranet.3squared.com/2012/11/a-successful-git-branching-model/
+ 
+ Other tutorials:
+    http://try.github.io/levels/1/challenges/1
+    http://pcottle.github.io/learnGitBranching/
+    http://sourcetreeapp.com/
+    http://blog.sourcetreeapp.com/2012/08/21/merge-or-rebase/
+    GitLab
+    
+    Git-flow branching model
+ 
+ 
+ 
