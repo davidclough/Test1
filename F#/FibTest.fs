@@ -1,5 +1,3 @@
-module FibTest
-
 open System
 
 let withThousandsSeparator (i: int64) =
