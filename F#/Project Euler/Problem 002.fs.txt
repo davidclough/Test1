@@ -1,0 +1,34 @@
+open System
+
+let withThousandsSeparator (i: int64) =
+    String.Format("{0:#,##0}", i)
+
+// Project Euler - Problem 2.
+// By considering the terms in the Fibonacci sequence whose values do not exceed
+// four million, find the sum of the even-valued terms.
+let getFibValues =
+    let fibSeq = Seq.unfold(fun (a, b) -> Some(a + b, (b, a + b)))(int64 0, int64 1)
+    let fibList = fibSeq |> Seq.take(70) |> Seq.toList
+    fibList
+
+printf "\r\nProject Euler, problem 2, first Fibonacci values:\r\n%A\r\n" getFibValues
+
+let fibFourMillion =
+    let fibSeq = Seq.unfold(fun (a, b) -> Some(a + b, (b, a + b)))(int64 0, int64 1)
+    let result = fibSeq |> Seq.takeWhile (fun elem -> elem <= 4000000L)
+    result |> Seq.toList
+
+let fibFourMillionEven =
+    let fibList = fibFourMillion |> Seq.filter (fun x -> x % 2L = 0L)
+    fibList |> Seq.toList
+
+let fibFourMillionEvenSum =
+    let sum = fibFourMillionEven |> Seq.sum
+    sum
+
+// Result appears a little further up in output window.
+printf "\r\n****** Project Euler, problem 2 result = %s\r\n"
+       (fibFourMillionEvenSum |> withThousandsSeparator)
+
+       
+       

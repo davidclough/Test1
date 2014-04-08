@@ -1,0 +1,22 @@
+open System
+
+let withThousandsSeparator (i: int) =
+    String.Format("{0:#,##0}", i)
+
+let printWholeSequence seq =
+    seq |> Seq.iter(printf "%A ")
+
+// Project Euler - Problem 1.
+// Sum of the multiples of 3 or 5 below 1000.
+let multiplesOf3or5below1000 =
+    [1..999] |> Seq.filter (fun x -> x % 3 = 0 || x % 5 = 0)
+
+//printf "%A" multiplesOf3or5below1000          // Truncates after a while.
+multiplesOf3or5below1000 |> printWholeSequence
+
+let answer = multiplesOf3or5below1000 |> Seq.sum
+    
+printf "\r\n\r\n****** Project Euler, problem 1 result = %s\r\n"
+       (answer |> withThousandsSeparator)
+
+
