@@ -18,7 +18,7 @@ let duration f =
             (duration.Ticks |> withThousandsSeparator)
     returnValue
 
-// Basic recursive attempt. Just a bit inefficient.
+// METHOD 1: Basic recursive attempt. Just a bit inefficient.
 let rec fib = function
     | 0 -> int64 0
     | 1 -> int64 1
@@ -26,6 +26,7 @@ let rec fib = function
     | x when x > 1 -> fib(x - 2) + fib(x - 1)
     | _ -> failwith "must be called with non-negative int"
     
+// METHOD 2: Caching.
 // Instead try storing previous calculations as go along.
 let fib' = function
     | 0 -> int64 0
@@ -36,6 +37,7 @@ let fib' = function
         List.nth fibList (x - 2)
     | _ -> failwith "must be called with non-negative int"
 
+// METHOD 3: Formula.
 // Or just use the formula (need something extra to convert between int and float domains).
 let sqrt5 = sqrt 5.0
 let fib'' = function
@@ -45,6 +47,10 @@ let fib'' = function
         let n = sqrt5 / 5.0 * ((1.0 + sqrt5) / 2.0) ** x' - ((1.0 - sqrt5) / 2.0) ** x' // http://rybkaforum.net/cgi-bin/rybkaforum/topic_show.pl?tid=15843
         int64 (Math.Round(n))
     | _ -> failwith "must be called with non-negative int"
+
+//
+// Compare methods.
+//
    
 // Much beyond 35 first one starts to really struggle.
 for x in [0..35] do
@@ -68,6 +74,8 @@ for x in [300000..300010] do
     printf "\r\n%i:\r\n" x
     printf "Fibonacci with caching: %i\r\n" (duration(fun() -> fib' x))
     printf "Fibonacci with formula: %i\r\n" (duration(fun() -> fib'' x))
+
+//-------------------------------------------------------------------------------------------------
 
 // Project Euler - Problem 2.
 // By considering the terms in the Fibonacci sequence whose values do not exceed
