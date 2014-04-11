@@ -1,0 +1,71 @@
+open System
+
+let withThousandsSeparator (i: int64) =
+    String.Format("{0:#,##0}", i)
+
+let number = 600851475143L
+//let number = 20L
+
+let getNextIncrement = function
+    | x when x <= 2L -> 1L
+    | _ -> 2L
+
+let rec tryNextFactor x factor increment =
+    printf "\nx = %d, factor = %d, i = %d" x factor increment
+    let i = getNextIncrement factor
+
+    match x, factor with
+    | x', _ when x' = 1L -> factor
+    | x', f when x' % f = 0L -> tryNextFactor (x / factor) factor i
+    | _, _ -> tryNextFactor x (factor + i) i
+
+let getHighestPrimeFactor x =
+    tryNextFactor x 2L 1L
+
+printf "\n\nHighest prime factor of %A is %A"
+       (number |> withThousandsSeparator)
+       (getHighestPrimeFactor number |> withThousandsSeparator)
+
+    
+// A MORE FUNCTIONAL APPROACH THAN BELOW BUT LESS THAN ABOVE.
+//    let number = 600851475143L
+//    //let number = 20L
+//
+//    let getNextIncrement = function
+//        | x when x <= 2L -> 1L
+//        | _ -> 2L
+//
+//    let rec tryNextFactor x factor increment =
+//        printf "\nx = %d, factor = %d, i = %d" x factor increment
+//
+//        let i = getNextIncrement factor
+//        if x > 1L then
+//            if x % factor = 0L then
+//                tryNextFactor (x / factor) factor i
+//            else
+//                tryNextFactor x (factor + i) i
+//        else
+//            factor
+//
+//    let getHighestPrimeFactor x =
+//        tryNextFactor x 2L 1L
+//
+//    printf "\n\nHighest prime factor of %d is %d" number (getHighestPrimeFactor number)
+
+
+// MOST IMPERATIVE APPROACH.
+////    let mutable n = 600851475143L //not even, so 2 wont be a factor
+////
+////    let getHighestPrimeFactor m =
+////        let mutable n = m
+////        let mutable factor = 2L
+////        while n > 1L do
+////            if n % factor = 0L then
+////                n <- n / factor
+////            else
+////                factor <- factor + 1L //skip even numbers AFFTTER FISRT ADDITION
+////        factor
+////
+////    printf "\n\nFactor = %d" (getHighestPrimeFactor n)
+
+    
