@@ -3,13 +3,27 @@ open System
 let withThousandsSeparator (i: int64) =
     String.Format("{0:#,##0}", i)
 
-    // 4 - Palindromes
-    let threeDigits = [999..-1..100]
+let printWholeSequence seq =
+    seq |> Seq.iter(printf "%A ")
+    
+// 4 - Palindromes
+let allThreeDigitIntegers = [999L..(-1L)..100L]
 
-    let reverse (s: string) =
-        new string(Array.rev (s.ToCharArray()))
+let reverse (s: string) =
+    new string(Array.rev (s.ToCharArray()))
 
-    let palindromes = threeDigits |> Seq.map (fun x -> 
-        let strX = x.ToString()
-        let strPalindrome = strX + (strX |> reverse)
-        Int64.Parse(strPalindrome)) 
+let generatePalindromicInteger = fun x ->
+    let strX = x.ToString()
+    let strPalindrome = strX + (strX |> reverse)
+    Int64.Parse(strPalindrome)
+
+let palindromes = allThreeDigitIntegers |> Seq.map generatePalindromicInteger
+
+palindromes |> printWholeSequence
+
+let hasTwoThreeDigitFactors x =
+    let root = x |> float |> sqrt |> int64
+    [999L..(-1L)..root] |> Seq.exists (fun elem -> x % elem = 0L && x / elem < 1000L)
+
+let result = palindromes |> Seq.find hasTwoThreeDigitFactors
+printfn "\n\nResult = %d " result
