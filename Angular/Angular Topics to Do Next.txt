@@ -1,0 +1,14 @@
+Angular Topics to Do Next:
+
+Small, organised modular project - will need to have covered a few more topics beforehand.
+
+Directives - Function in different file - & Local Scope Property - http://weblogs.asp.net/dwahlin/creating-custom-angularjs-directives-part-2-isolate-scope.
+Directives - Transclusion and restriction - https://weblogs.asp.net/dwahlin/creating-custom-angularjs-directives-part-4-transclusion-and-restriction
+
+Observing Model Changes with $watch
+Validating User Input
+Communicating Over $http
+Working with RESTful Resources
+The $q and the Promise
+Services and factories
+Routing - Load in different content
