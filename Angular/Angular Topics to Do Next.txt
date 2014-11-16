@@ -12,3 +12,4 @@ Working with RESTful Resources
 The $q and the Promise
 Services and factories
 Routing - Load in different content
+Reuse of module code
