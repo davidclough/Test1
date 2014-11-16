@@ -1,0 +1,90 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+    "http://www.w3.org/TR/html4/loose.dtd">
+<html ng-app='expanderModule'>
+
+  <head>
+    <title>Expander</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.8/angular.js"></script>
+    <link href="Expander2.css" rel='stylesheet'>
+  </head>
+
+  <body>
+    <div ng-controller='SomeController'>
+      <expander class='expander' expander-title='title'>
+        {{text}}
+      </expander>
+      <div my-isolated-scope-with-name name="{{title}}"></div>
+
+      <input ng-model="animal" type="text" /><span>{{animal}}</span>
+      <div my-isolated-scope-with-model animal="animal"></div>
+    </div>
+
+    <div my-isolated-scope-with-name name="Fredo">aaa</div>
+  </body>
+
+  <script>
+    function SomeController($scope) {
+      $scope.title = 'Click me to expand';
+      $scope.text = 'Hi there folks, I am the content '
+          + 'that was hidden but is now shown.';
+      $scope.animal = "badgonkey";
+    }
+    angular.module('expanderModule', [])
+        .directive('expander', function() {
+          return {
+            restrict: 'EA',
+            replace: true,
+            transclude: true,
+            scope: { title:'=expanderTitle' },
+            template: '<div>' +
+                '<div class="title" ng-click="toggle()">{{title}}</div>' +
+                '<div class="body" ng-show="showMe" ng-transclude></div>' +
+                '</div>',
+            link: function(scope, element, attrs) {
+              scope.showMe = false;
+              scope.toggle = function() {
+                scope.showMe = !scope.showMe;
+              }
+            }
+          };
+        })
+        .directive('myIsolatedScopeWithName', function () {
+          return {
+              scope: {
+                  name: '@'
+              },
+              template: 'Name: {{ name }}'
+            };
+        })
+        .directive('myIsolatedScopeWithModel', function () {
+          return {
+              scope: {
+                  animal: '=' //Two-way data binding
+              },
+              //template: '<ul><li ng-repeat="prop in customer">{{ prop }}</li></ul>'
+
+              //template: 'animal = {{animal}}'
+              templateUrl: 'AnimalTemplate.html'
+            };
+        })
+        .filter('titleCase', function() {
+          var titleCaseFilter = function(input) {
+            return input.toUpperCase();
+
+
+            var words = input.split(' ');
+            for (var i = 0; i < words.length; i++) {
+              words[i] = words[i].charAt(0).toUpperCase() + words[i].slice(1);
+            }
+            return words.join(' ');
+          };
+          return titleCaseFilter;
+        });
+
+  </script>
+</html>
+
+<!-- https://github.com/shyamseshadri/angularjs-book/blob/master/chapter6/expander.html -->
+
+
+

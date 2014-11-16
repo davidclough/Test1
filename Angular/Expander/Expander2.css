@@ -1,0 +1,33 @@
+.expander
+{
+  border: 1px solid black;
+  width: 250px;
+}
+
+.expander > .title
+{
+  background-color: black;
+  color: white;
+  padding: .1em .3em;
+  cursor: pointer;
+}
+
+.expander > .body
+{
+  padding: .1em .3em;
+}
+
+.animal-container
+{
+	color: #0aa;
+	border: solid 5px #03c;
+	margin: 20px 0;
+	padding: 15px;
+	background-color: #eea
+}
+
+.animal-red
+{
+	color:#c00;
+}
+
